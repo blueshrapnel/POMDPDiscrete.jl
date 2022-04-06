@@ -1,6 +1,3 @@
-using POMDPDiscrete
-using Test
+using SafeTestsets
 
-@testset "POMDPDiscrete.jl" begin
-    # Write your tests here.
-end
+@safetestset "grid state tests" begin include("state_tests.jl") end
