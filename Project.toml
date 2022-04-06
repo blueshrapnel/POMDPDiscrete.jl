@@ -1,0 +1,13 @@
+name = "POMDPDiscreteGridWorld"
+uuid = "aa04c496-6b40-4d2a-8ca6-8c8383c0a308"
+authors = ["Karen Archer"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
