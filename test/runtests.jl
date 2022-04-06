@@ -1,6 +1,6 @@
 using POMDPDiscreteGridWorld
 using Test
 
-@testset "POMDPDiscreteGridWorld.jl" begin
+@testset "POMDPDiscrete.jl" begin
     # Write your tests here.
 end

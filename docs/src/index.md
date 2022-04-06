@@ -4,7 +4,7 @@ CurrentModule = POMDPDiscreteGridWorld
 
 # POMDPDiscreteGridWorld
 
-Documentation for [POMDPDiscreteGridWorld](https://github.com/blueshrapnel/POMDPDiscreteGridWorld.jl).
+Documentation for [POMDPDiscreteGridWorld](https://github.com/blueshrapnel/POMDPDiscrete.jl).
 
 ```@index
 ```

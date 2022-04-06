@@ -6,11 +6,11 @@ DocMeta.setdocmeta!(POMDPDiscreteGridWorld, :DocTestSetup, :(using POMDPDiscrete
 makedocs(;
     modules=[POMDPDiscreteGridWorld],
     authors="Karen Archer",
-    repo="https://github.com/blueshrapnel/POMDPDiscreteGridWorld.jl/blob/{commit}{path}#{line}",
-    sitename="POMDPDiscreteGridWorld.jl",
+    repo="https://github.com/blueshrapnel/POMDPDiscrete.jl/blob/{commit}{path}#{line}",
+    sitename="POMDPDiscrete.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://blueshrapnel.github.io/POMDPDiscreteGridWorld.jl",
+        canonical="https://blueshrapnel.github.io/POMDPDiscrete.jl",
         assets=String[],
     ),
     pages=[
@@ -19,6 +19,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/blueshrapnel/POMDPDiscreteGridWorld.jl",
+    repo="github.com/blueshrapnel/POMDPDiscrete.jl",
     devbranch="main",
 )
