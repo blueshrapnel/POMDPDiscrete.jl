@@ -1,10 +1,10 @@
-using POMDPDiscreteGridWorld
+using POMDPDiscrete
 using Documenter
 
-DocMeta.setdocmeta!(POMDPDiscreteGridWorld, :DocTestSetup, :(using POMDPDiscreteGridWorld); recursive=true)
+DocMeta.setdocmeta!(POMDPDiscrete, :DocTestSetup, :(using POMDPDiscrete); recursive=true)
 
 makedocs(;
-    modules=[POMDPDiscreteGridWorld],
+    modules=[POMDPDiscrete],
     authors="Karen Archer",
     repo="https://github.com/blueshrapnel/POMDPDiscrete.jl/blob/{commit}{path}#{line}",
     sitename="POMDPDiscrete.jl",

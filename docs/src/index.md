@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = POMDPDiscreteGridWorld
+CurrentModule = POMDPDiscrete
 ```
 
-# POMDPDiscreteGridWorld
+# POMDPDiscrete
 
-Documentation for [POMDPDiscreteGridWorld](https://github.com/blueshrapnel/POMDPDiscrete.jl).
+Documentation for [POMDPDiscrete](https://github.com/blueshrapnel/POMDPDiscrete.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [POMDPDiscreteGridWorld]
+Modules = [POMDPDiscrete]
 ```

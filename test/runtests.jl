@@ -1,4 +1,4 @@
-using POMDPDiscreteGridWorld
+using POMDPDiscrete
 using Test
 
 @testset "POMDPDiscrete.jl" begin

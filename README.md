@@ -1,4 +1,4 @@
-# POMDPDiscreteGridWorld
+# POMDPDiscrete
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://blueshrapnel.github.io/POMDPDiscrete.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://blueshrapnel.github.io/POMDPDiscrete.jl/dev)

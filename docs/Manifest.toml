@@ -60,7 +60,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
-[[deps.POMDPDiscreteGridWorld]]
+[[deps.POMDPDiscrete]]
 path = ".."
 uuid = "aa04c496-6b40-4d2a-8ca6-8c8383c0a308"
 version = "0.1.0"

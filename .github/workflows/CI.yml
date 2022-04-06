@@ -54,6 +54,6 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using POMDPDiscreteGridWorld
-            DocMeta.setdocmeta!(POMDPDiscreteGridWorld, :DocTestSetup, :(using POMDPDiscreteGridWorld); recursive=true)
-            doctest(POMDPDiscreteGridWorld)'
+            using POMDPDiscrete
+            DocMeta.setdocmeta!(POMDPDiscrete, :DocTestSetup, :(using POMDPDiscrete); recursive=true)
+            doctest(POMDPDiscrete)'
