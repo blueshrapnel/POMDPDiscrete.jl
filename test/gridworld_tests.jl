@@ -51,6 +51,8 @@ end
     @test length(ss) == length(mdp)
     @test test_state_indexing(mdp, ss)
 
+    @test rand(initialstate(mdp)) isa State
+
 end
 
 function test_action_indexing(mdp::GridWorld, action_space::Vector{Symbol}) 
@@ -69,5 +71,18 @@ end
     @test test_action_indexing(mdp, action_space)
 end
 
+@testset "reward" begin
+    mdp = GridWorld(
+        size=(4,4),
+        absorbing_states=[State(1,1), State(4,4)])
+    @test reward(mdp, State(1,1)) == 0
+    @test reward(mdp, State(4,4)) == 0
+    @test reward(mdp, State(1,2)) == -1
+    @test reward(mdp, State(3,2)) == -1
 
+    @test isterminal(mdp, State(1,1))
+    @test isterminal(mdp, State(4,4))
+    @test !isterminal(mdp, State(4,3))
+    @test !isterminal(mdp, State(2,3))
+end
 

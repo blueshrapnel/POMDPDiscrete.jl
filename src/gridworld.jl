@@ -91,7 +91,6 @@ POMDPs.states(mdp::GridWorld) = mdp.𝒮
 
 POMDPs.stateindex(mdp::GridWorld, s::State) = LinearIndices(mdp.ci)[s.x, s.y]
 
-
 POMDPs.initialstate(mdp::GridWorld) = Uniform(mdp.𝒮)# Deterministic(State(4,4))
 
 #= Action space
@@ -125,3 +124,23 @@ const MOVEMENTS = Dict(
 	:down  => State(0, -1),
 	:left  => State(-1, 0)
 );	
+
+#= Reward function
+==================
+In this case the reward function is dependent only on the state, although typically it is also dependent on the action taken, and potentially also the successor state R(s, a, s′)
+*	one possibility would be to store the reward_states as a list of states in which the agent receives a reward, and a corresponding reward_values vector which contains the values of rewards received in those sttes, you could define this in the GridWorld struct
+*	another alternative would be to declare a list of absorbing states, these states have a reward of 0 and other states then have a reward of -1
+=#
+function POMDPs.reward(mdp::GridWorld, s::State, a::Any=nothing)  
+	# currently no check for whether the state is in 𝒮 
+	# so any state valid or not incurs a cost of -1, this is important for bumping off walls, etc. 
+	# define a simple corner goal
+	if s ∈ mdp.absorbing_states
+		return 0
+	else
+		return -1
+	end
+end
+
+POMDPs.isterminal(mdp::GridWorld, s::State) = s ∈ mdp.absorbing_states 
+
