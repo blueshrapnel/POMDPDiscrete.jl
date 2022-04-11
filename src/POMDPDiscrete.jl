@@ -1,13 +1,14 @@
 module POMDPDiscrete
 
-using POMDPs
+using POMDPs, POMDPModelTools
 
 export 
     GridWorld,
-    State
+    State 
 
 
-include("grid_states.jl")
+
+include("gridworld.jl")
 
 
 end

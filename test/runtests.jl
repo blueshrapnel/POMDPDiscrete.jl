@@ -1,3 +1,3 @@
 using SafeTestsets
 
-@safetestset "grid state tests" begin include("state_tests.jl") end
+@safetestset "gridworld tests" begin include("gridworld_tests.jl") end

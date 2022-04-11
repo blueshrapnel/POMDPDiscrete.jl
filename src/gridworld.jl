@@ -31,8 +31,9 @@ struct State
 	y::Int64					# y position
 end
 
-    # helper functions for working with grid world states
+# helper functions for working with grid world states
 # Base comparison operator to check whether the coordinates of the two states are equal
+
 Base.:(==)(s1::State, s2::State) = (s1.x == s2.x) && (s1.y == s2.y)
 
 # State arithmetic for effecting transitions : Base add operator to add two states 
@@ -56,6 +57,10 @@ mutable struct GridWorld <: MDP{State, Symbol}  # MDP{state_type, action_type}
 	next_states::Dict{Tuple{State, Symbol}, Vector{Symbol}}
 end
 
+# the length of a GridWorld is the number of states
+# note this currently assumes every cell in the grid is a state
+Base.length(mdp::GridWorld) = prod(mdp.size)
+
 # Default Contstructor for GridWorld mdp container
 function GridWorld(
 	# parameters
@@ -76,3 +81,47 @@ end
 
 # check whether a state is within the gridworld - move first, questions later
 inbounds(mdp::GridWorld, s::State) = 1 ≤ s.x ≤ mdp.size[1] && 1 ≤ s.y ≤ mdp.size[2]
+
+#= State space
+==============
+𝒮 = [[State(x,y) for x=1:mdp.size[1], y=1:mdp.size[2]]..., mdp.null_state]
+=#
+
+POMDPs.states(mdp::GridWorld) = mdp.𝒮
+
+POMDPs.stateindex(mdp::GridWorld, s::State) = LinearIndices(mdp.ci)[s.x, s.y]
+
+
+POMDPs.initialstate(mdp::GridWorld) = Uniform(mdp.𝒮)# Deterministic(State(4,4))
+
+#= Action space
+===============
+cardinal actions
+* 	use `@enum` to represent the actions, this simplifies actionindex, 
+	remember though that enum is base 0, so SKIP 0 to avoid BoundsError
+	e.g. @enum Action SKIP UP RIGHT DOWN LEFT # synonymous with North, East, South, West - enum is 0 based
+* 	so better to use Symbol and then an explicit actionindex function.
+*	define a constant movements dictionary to effect action transitions 
+=#
+
+POMDPs.actions(mdp::GridWorld) = mdp.𝒜
+
+function POMDPs.actionindex(mdp::GridWorld, a::Union{Symbol}) 
+	if a == :up
+		return 1
+	elseif a == :right
+		return 2
+	elseif a == :down
+		return 3
+	elseif a == :left
+		return 4
+	end
+	error("Invalid action in GridWorld: $a")
+end
+
+const MOVEMENTS = Dict(
+	:up    => State(0, 1), 
+	:right => State(1, 0),
+	:down  => State(0, -1),
+	:left  => State(-1, 0)
+);	
