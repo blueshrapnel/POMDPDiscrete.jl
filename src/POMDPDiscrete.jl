@@ -1,14 +1,20 @@
 module POMDPDiscrete
 
-using POMDPs, POMDPModelTools
+using POMDPs
+using POMDPModelTools
+
+using Plots
+using ColorSchemes
 
 export 
     GridWorld,
-    State 
+    State,
+    plot_grid_world
 
 
 
 include("gridworld.jl")
+include("gridworld_visualisation.jl")
 
 
 end
