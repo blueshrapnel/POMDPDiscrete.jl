@@ -74,7 +74,8 @@ end
 @testset "reward" begin
     mdp = GridWorld(
         size=(4,4),
-        absorbing_states=[State(1,1), State(4,4)])
+        absorbing_states=[State(1,1), State(4,4)],
+        p_transition=0.7)
     @test reward(mdp, State(1,1)) == 0
     @test reward(mdp, State(4,4)) == 0
     @test reward(mdp, State(1,2)) == -1
@@ -86,3 +87,66 @@ end
     @test !isterminal(mdp, State(2,3))
 end
 
+@testset "transition and next state distribution" begin
+    mdp = GridWorld(
+        size=(9,11),
+        absorbing_states=[State(5,6)])
+    s = rand(initialstate(mdp))
+    p_s′ = transition(mdp, s, :up)
+
+    if p_s′ isa SparseCat
+        @test sum(p_s′.probs)  ≈ 1
+    elseif p_s′ isa Deterministic
+        @test pdf(p_s′, p_s′.val) == 1
+    else
+        # currently not returning any other distributions    
+        @test false
+    end
+
+    # now test specific spcecific transitions
+    # confirming that bottom left is State(1,1)
+    s = State(3,3)
+    p_s′ = transition(mdp, s, :down)
+    @test pdf(p_s′, State(3,2)) ≈ 0.7
+    @test pdf(p_s′, State(2,3)) ≈ 0.1
+    @test pdf(p_s′, State(4,3)) ≈ 0.1
+    @test pdf(p_s′, State(3,4)) ≈ 0.1
+    s = mode(p_s′)
+    s′ = mode(transition(mdp, s, :right))
+    @test s′ == State(4,2)
+    s′′ = mode(transition(mdp, s′, :down))
+    @test s′′ == State(4,1)
+    # testing transition on the boundary
+    p_s′′′ = transition(mdp, s′′, :down)
+    @test pdf(p_s′′′, State(4,1)) ≈ 0.7
+    @test pdf(p_s′′′, State(3,1)) ≈ 0.1
+    @test pdf(p_s′′′, State(5,1)) ≈ 0.1
+    @test pdf(p_s′′′, State(4,2)) ≈ 0.1
+
+    # testing transition into absorbing state
+    s = State(6,5)
+    s′ = mode(transition(mdp, s, :up))
+    @test s′ == State(6,6)
+    p_s′′ = transition(mdp, s′, :left)
+    @test pdf(p_s′′, State(5,6)) ≈ 0.7
+    @test pdf(p_s′′, State(6,7)) ≈ 0.1
+    @test pdf(p_s′′, State(6,5)) ≈ 0.1
+    @test pdf(p_s′′, State(7,6)) ≈ 0.1
+
+    # test all actions from terminal state absorbed
+    abs_s = State(5,6)
+    for a in actions(mdp)
+        p_s′ = transition(mdp, abs_s, a) 
+        @test p_s′ isa Deterministic
+        @test mode(p_s′) == State(5,6)
+    end
+
+    # test corner state
+    s = State(1,1)
+    p_s′ = transition(mdp, s, :left)
+    @test pdf(p_s′, State(1,1)) ≈ 0.8
+    @test pdf(p_s′, State(2,1)) ≈ 0.1
+    @test pdf(p_s′, State(1,2)) ≈ 0.1
+    # test a random other state is zero
+    @test pdf(p_s′, State(5,6)) ≈ 0
+end

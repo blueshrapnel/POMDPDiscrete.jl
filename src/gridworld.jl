@@ -144,3 +144,50 @@ end
 
 POMDPs.isterminal(mdp::GridWorld, s::State) = s ∈ mdp.absorbing_states 
 
+#= Distributions
+================
+*	transition function, probabilistic model T(s′,s,a) = Pr(s′| s,a) - use SparseCat ( a vector of states and a vector of their probabilities)
+*	transition distribution T(⋅,s,a) - the actual distribution over the states that the agent can reach from (s,a), the distribution over s′.
+
+NOTE: typically we say (s,a) pair but for convenience we will store T[s′,a,s]
+=#
+
+#= Transition model struct NothingPolicy <: Policy end
+===================
+the dynamics of the grid world
+use the p_transition parameter as the probability that the agent moves in the specified direction, with the remainder apportioned equally between other reachable states in the transition distribution
+=#
+
+function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
+	
+	if reward(mdp, s) == 0 # if the reward is zero, it signifies a goal state
+		return Deterministic(s) 	# goal is absorbing for all actions
+	end
+	
+	Nₐ = length(mdp.𝒜)
+	# make allowance for remaining in the current state, hence use size Nₐ + 1 
+	# currently not using the next_states dictionary in the mdp container
+	next_states = Vector{State}(undef, Nₐ + 1)  
+	probabilities = zeros(Nₐ + 1)
+	# probability of target destination
+	# remaining probability is apportioned equally between remaining actions
+	p_transition = mdp.p_transition 
+	
+	# denote next action and state by a' and s' using \prime
+	# process all actions so that resulting state distribution includes all outcomes
+	for (i, a′) in enumerate(mdp.𝒜)
+		prob = (a′ == a) ? p_transition : (1-p_transition) / (Nₐ - 1)
+		s′ = s + MOVEMENTS[a′]
+		next_states[i+1] = s′
+		if inbounds(mdp, s′)
+			probabilities[i+1] += prob
+		end
+	end
+
+	# out-of-bounds, remain in current state for unallocated probability mass
+	next_states[1] = s
+	probabilities[1] = 1 - sum(probabilities)
+
+	return SparseCat(next_states, probabilities) 
+	
+end
