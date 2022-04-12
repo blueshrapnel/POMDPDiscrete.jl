@@ -5,3 +5,4 @@
 [![Build Status](https://github.com/blueshrapnel/POMDPDiscrete.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/blueshrapnel/POMDPDiscrete.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Build Status](https://travis-ci.com/blueshrapnel/POMDPDiscrete.jl.svg?branch=main)](https://travis-ci.com/blueshrapnel/POMDPDiscrete.jl)
 [![Coverage](https://codecov.io/gh/blueshrapnel/POMDPDiscrete.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/blueshrapnel/POMDPDiscrete.jl)
+[![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
