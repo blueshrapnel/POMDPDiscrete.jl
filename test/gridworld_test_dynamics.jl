@@ -15,13 +15,14 @@ using Test
     @test State(4,3) != State(0,0)
 end
 
-@testset "GridWorld Constructor" begin
+@testset "GridWorld Constructor and discount" begin
     @test GridWorld() isa GridWorld
     @test GridWorld(
         size=(4,4), p_transition=0.8, 
         absorbing_states=[State(1,1), State(4,4)], 
         γ=0.99) isa GridWorld
-        @test GridWorld(γ=0.5) isa GridWorld
+    mdp = GridWorld(γ=0.5)
+    @test discount(mdp) == 0.5
 end
 
 function test_state_indexing(mdp::GridWorld, ss::Vector{State}) 

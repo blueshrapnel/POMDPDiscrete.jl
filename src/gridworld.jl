@@ -158,6 +158,9 @@ the dynamics of the grid world
 use the p_transition parameter as the probability that the agent moves in the specified direction, with the remainder apportioned equally between other reachable states in the transition distribution
 =#
 
+# discount factor
+POMDPs.discount(mdp::GridWorld) = mdp.γ
+
 function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
 	
 	if reward(mdp, s) == 0 # if the reward is zero, it signifies a goal state
