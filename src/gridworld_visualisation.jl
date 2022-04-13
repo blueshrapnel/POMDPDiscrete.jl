@@ -12,15 +12,15 @@ rectangle(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
 
 
 function plot_grid_world(
-	mdp::MDP; 
+	mdp::MDP;
 	s::Union{State, Nothing}=nothing,
 	policy::Union{Policy, Nothing}=nothing,
 	title::Union{String, Nothing}=nothing)
 	xmax, ymax = mdp.size
 	empty = zeros(mdp.size)
 	fig = heatmap(
-		empty, 
-		legend=:none, 
+		empty,
+		legend=:none,
 		aspect_ratio=:equal,
 		framestyle=:box,
 		tickdirection=:out,
@@ -29,7 +29,7 @@ function plot_grid_world(
     ylims!(0.5, ymax+0.5)
     xticks!(1:xmax)
     yticks!(1:ymax)
-	
+
 	# plot cell outlines
     for x in 1:xmax, y in 1:ymax
         # display policy on the plot as arrows
@@ -42,14 +42,14 @@ function plot_grid_world(
 		nothing
 	elseif isa(policy, StochasticValuePolicy)
 		GR.setarrowsize(0.5)
-		# column major 
+		# column major
 		xs = repeat(1:xmax, 1, ymax) |> vec
 		ys = repeat(1:ymax, 1, xmax)' |> vec
 
 		for a in ordered_actions(mdp)
 			action_probs = policy.π[:,actionindex(mdp, a)]
 			movement = MOVEMENTS[a]
-			us, vs = action_probs .* movement.x, action_probs .* movement.y			
+			us, vs = action_probs .* movement.x, action_probs .* movement.y
 			quiver!(xs, ys, quiver=(us, vs), color=:blue)
 		end
 	end
@@ -64,13 +64,39 @@ function plot_grid_world(
 	return fig
 end
 
-function POMDPModelTools.render(mdp::GridWorld, step=nothing; 
+function POMDPModelTools.render(mdp::GridWorld, step=nothing;
     s::Union{State, Nothing}=nothing,
     policy::Union{Policy, Nothing}=nothing,
     title::Union{String, Nothing}=nothing)
     return plot_grid_world(
-        mdp::MDP; 
+        mdp::MDP;
         s=s,
         policy=nothing,
         title=nothing)
+end
+
+"""
+    policy_grid(mdp, policy)
+    policy_grid(mdp, xmax, ymax)
+
+Return a representation of the policy using unicode arrows stored in a Matrix{String}, where each state is represented by an element of the matrix.
+"""
+function policy_grid(mdp::GridWorld, policy::Policy)
+    xmax, ymax = mdp.size
+    return policy_grid(policy, xmax, ymax)
+end
+
+function policy_grid(policy::Policy, xmax::Int, ymax::Int)
+    arrows = Dict( :up => "↑",
+                   :right => "→",
+                   :down => "↓",
+                   :left => "←")
+    grid = Array{String}(undef, xmax, ymax)
+    for x in 1:xmax, y in 1:ymax
+        s = State(x,y)
+		# selects the action from the policy given the state
+        grid[x,y] = arrows[action(policy, s)]
+    end
+
+    return grid
 end
