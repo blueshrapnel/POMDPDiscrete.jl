@@ -214,16 +214,14 @@ function build_probabilistic_model(mdp)
 
     for sa in eachrow(sa_pairs)
         s = sa[1]; a = sa[2];
-        if !isterminal(mdp, s)
-            # i in the variable name denotes index
-            si = stateindex(mdp, s)
-            ai = actionindex(mdp, a)
-            ps′ = transition(mdp, s, a)
-            for (s′, p) in weighted_iterator(ps′)
-                if p > 0.0
-                    s′i = stateindex(mdp, s′)
-                    P[s′i, ai, si] += p
-                end
+        # i in the variable name denotes index
+        si = stateindex(mdp, s)
+        ai = actionindex(mdp, a)
+        ps′ = transition(mdp, s, a)
+        for (s′, p) in weighted_iterator(ps′)
+            if p > 0.0
+                s′i = stateindex(mdp, s′)
+                P[s′i, ai, si] += p
             end
         end
     end
