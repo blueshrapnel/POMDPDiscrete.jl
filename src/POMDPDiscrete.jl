@@ -19,6 +19,7 @@ export
 include("gridworld.jl")
 include("gridworld_visualisation.jl")
 include("stochastic_policy.jl")
+include("probabilistic_model.jl")
 
 
 end

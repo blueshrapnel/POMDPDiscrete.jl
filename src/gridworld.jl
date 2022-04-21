@@ -202,37 +202,3 @@ function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
 	return SparseCat(next_states, probabilities)
 
 end
-
-"""
-    build_probabilistic_model(mdp)
-
-Return a `SparseArray` representing T[s′, a, s], taking into account multiple successor states for action/state pairs.
-"""
-
-function build_probabilistic_model(mdp)
-    P = zeros(mdp.Nₛ, mdp.Nₐ, mdp.Nₛ)
-    sa_pairs =  [repeat(states(mdp), inner=[mdp.Nₐ]) repeat(actions(mdp), outer=[mdp.Nₛ])]
-
-    for sa in eachrow(sa_pairs)
-        s = sa[1]; a = sa[2];
-        # i in the variable name denotes index
-        si = stateindex(mdp, s)
-        ai = actionindex(mdp, a)
-        ps′ = transition(mdp, s, a)
-        for (s′, p) in weighted_iterator(ps′)
-            if p > 0.0
-                s′i = stateindex(mdp, s′)
-                P[s′i, ai, si] += p
-            end
-        end
-    end
-    return P
-end
-
-mdp = GridWorld(
-    size=(3,3),
-    p_transition=1.0,
-    absorbing_states=[State(1,1)],
-    γ=1.0)
-
-P = build_probabilistic_model(mdp)
