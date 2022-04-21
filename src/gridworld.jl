@@ -65,6 +65,7 @@ end
 Base.length(mdp::GridWorld) = prod(mdp.size)
 
 # Default Contstructor for GridWorld mdp container
+# if there are no absorbing states: absorbing_states=State[]
 function GridWorld(
 	# parameters
 	;size::Tuple{Int, Int}=(5,7),
