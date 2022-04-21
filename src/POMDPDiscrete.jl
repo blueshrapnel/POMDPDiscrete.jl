@@ -12,7 +12,8 @@ export
     State,
     plot_grid_world,
     random_stochastic_policy,
-    uniform_stochastic_policy
+    uniform_stochastic_policy,
+    policy_transition_matrix
 
 
 
