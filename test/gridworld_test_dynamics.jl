@@ -18,14 +18,14 @@ end
 @testset "GridWorld Constructor and discount" begin
     @test GridWorld() isa GridWorld
     @test GridWorld(
-        size=(4,4), p_transition=0.8, 
-        absorbing_states=[State(1,1), State(4,4)], 
+        size=(4,4), p_transition=0.8,
+        absorbing_states=[State(1,1), State(4,4)],
         γ=0.99) isa GridWorld
     mdp = GridWorld(γ=0.5)
     @test discount(mdp) == 0.5
 end
 
-function test_state_indexing(mdp::GridWorld, ss::Vector{State}) 
+function test_state_indexing(mdp::GridWorld, ss::Vector{State})
     for (i,s) in enumerate(states(mdp))
         if s != ss[i]
             return false
@@ -56,7 +56,7 @@ end
 
 end
 
-function test_action_indexing(mdp::GridWorld, action_space::Vector{Symbol}) 
+function test_action_indexing(mdp::GridWorld, action_space::Vector{Symbol})
     for (i,a) in enumerate(ordered_actions(mdp))
         if a != action_space[i]
             return false
@@ -100,7 +100,7 @@ end
     elseif p_s′ isa Deterministic
         @test pdf(p_s′, p_s′.val) == 1
     else
-        # currently not returning any other distributions    
+        # currently not returning any other distributions
         @test false
     end
 
@@ -137,7 +137,7 @@ end
     # test all actions from terminal state absorbed
     abs_s = State(5,6)
     for a in actions(mdp)
-        p_s′ = transition(mdp, abs_s, a) 
+        p_s′ = transition(mdp, abs_s, a)
         @test p_s′ isa Deterministic
         @test mode(p_s′) == State(5,6)
     end
@@ -150,4 +150,57 @@ end
     @test pdf(p_s′, State(1,2)) ≈ 0.1
     # test a random other state is zero
     @test pdf(p_s′, State(5,6)) ≈ 0
+
+end
+
+@testset "all deterministic transition is 2x2 grid" begin
+ # test every transition in simple 2x2 deterministic gridworld
+    mdp = GridWorld(
+        size=(2,2),
+        p_transition=1.0,
+        absorbing_states=[State(1,1)],
+        γ=1.0
+    )
+    sa_pairs =  [repeat(states(mdp), inner=[mdp.Nₐ]) repeat(actions(mdp), outer=[mdp.Nₛ])]
+
+    # build dictionary to check transitions
+    dyns = Dict()
+    for s in states(mdp)
+        dyns[s] = Dict(a=>[] for a in actions(mdp))
+    end
+    # State(1,1) is absorbing
+    dyns[State(1,1)][:up] = [State(1,1), 1.0]
+    dyns[State(1,1)][:right] = [State(1,1), 1.0]
+    dyns[State(1,1)][:down] = [State(1,1), 1.0]
+    dyns[State(1,1)][:left] = [State(1,1), 1.0]
+
+    dyns[State(2,1)][:up] = [State(2,2), 1.0]
+    dyns[State(2,1)][:right] = [State(2,1), 1.0]
+    dyns[State(2,1)][:down] = [State(2,1), 1.0]
+    dyns[State(2,1)][:left] = [State(1,1), 1.0]
+
+    dyns[State(1,2)][:up] = [State(1,2), 1.0]
+    dyns[State(1,2)][:right] = [State(2,2), 1.0]
+    dyns[State(1,2)][:down] = [State(1,1), 1.0]
+    dyns[State(1,2)][:left] = [State(1,2), 1.0]
+
+    dyns[State(2,2)][:up] = [State(2,2), 1.0]
+    dyns[State(2,2)][:right] = [State(2,2), 1.0]
+    dyns[State(2,2)][:down] = [State(2,1), 1.0]
+    dyns[State(2,2)][:left] = [State(1,2), 1.0]
+
+
+    for sa in eachrow(sa_pairs)
+        s = sa[1]; a = sa[2];
+        ps′ = transition(mdp, s, a)
+        for (s′, p) in weighted_iterator(ps′)
+            # test non zero transitions only
+            if p > 0
+                # check that all successor states are legal
+                @test stateindex(mdp, s′) isa Int
+                @test dyns[s][a] == [s′, p]
+            end
+        end
+    end
+
 end
