@@ -2,7 +2,7 @@
 #=
 MDP Container
 =============
-holds: 
+holds:
 * 	all the information required to define the MDP tuple (𝒮, 𝒜, T, R, γ)
 * 	gridworld parameters, either a custom struct or individual fields
 *	some helper fields
@@ -36,25 +36,28 @@ end
 
 Base.:(==)(s1::State, s2::State) = (s1.x == s2.x) && (s1.y == s2.y)
 
-# State arithmetic for effecting transitions : Base add operator to add two states 
+# State arithmetic for effecting transitions : Base add operator to add two states
 Base.:(+)(s1::State, s2::State) = State(s1.x + s2.x, s1.y + s2.y)
 
 mutable struct GridWorld <: MDP{State, Symbol}  # MDP{state_type, action_type}
 	# parameters
-	size::Tuple{Int, Int}      	# size of the grid 
+	size::Tuple{Int, Int}      	# size of the grid
 	p_transition::Real         	# probability of successful transition to target
 	γ::Real              		# discount factor
-	
+
 	absorbing_states::Vector{State} # vector of states which are absorbing
 	# for multiple reward_values vector of corresponding values for a list of reward_states
-	
+
 	# MDP tuple
 	𝒮::Vector{State}			 # state space
 	𝒜::Vector{Symbol} 			 # action space
-	
-	# helper fields 
+
+	# helper fields
 	ci::CartesianIndices	    # to access stateindex (xy2s)
 	next_states::Dict{Tuple{State, Symbol}, Vector{Symbol}}
+
+    Nₛ::Int
+    Nₐ::Int
 end
 
 # the length of a GridWorld is the number of states
@@ -64,19 +67,23 @@ Base.length(mdp::GridWorld) = prod(mdp.size)
 # Default Contstructor for GridWorld mdp container
 function GridWorld(
 	# parameters
-	;size::Tuple{Int, Int}=(5,7), 
+	;size::Tuple{Int, Int}=(5,7),
 	p_transition::Real=0.7,
 	absorbing_states::Vector{State}=[State(1,1)],
 	γ::Real=1.0)
 
-	# MDP tuple 
-	𝒮 = [[State(x,y) for x=1:size[1], y=1:size[2]]...] 
+	# MDP tuple
+	𝒮 = [[State(x,y) for x=1:size[1], y=1:size[2]]...]
 	𝒜 = [:up, :right, :down, :left]
-	
+
 	# helpers
 	ci = CartesianIndices((size[1], size[2]))
 	next_states = Dict()
-	return GridWorld(size, p_transition, γ, absorbing_states, 𝒮, 𝒜, ci, next_states)
+
+    Nₛ = length(𝒮)
+    Nₐ = length(𝒜)
+
+	return GridWorld(size, p_transition, γ, absorbing_states, 𝒮, 𝒜, ci, next_states, Nₛ, Nₐ)
 end
 
 # check whether a state is within the gridworld - move first, questions later
@@ -96,16 +103,16 @@ POMDPs.initialstate(mdp::GridWorld) = Uniform(mdp.𝒮)# Deterministic(State(4,4
 #= Action space
 ===============
 cardinal actions
-* 	use `@enum` to represent the actions, this simplifies actionindex, 
+* 	use `@enum` to represent the actions, this simplifies actionindex,
 	remember though that enum is base 0, so SKIP 0 to avoid BoundsError
 	e.g. @enum Action SKIP UP RIGHT DOWN LEFT # synonymous with North, East, South, West - enum is 0 based
 * 	so better to use Symbol and then an explicit actionindex function.
-*	define a constant movements dictionary to effect action transitions 
+*	define a constant movements dictionary to effect action transitions
 =#
 
 POMDPs.actions(mdp::GridWorld) = mdp.𝒜
 
-function POMDPs.actionindex(mdp::GridWorld, a::Union{Symbol}) 
+function POMDPs.actionindex(mdp::GridWorld, a::Union{Symbol})
 	if a == :up
 		return 1
 	elseif a == :right
@@ -119,11 +126,11 @@ function POMDPs.actionindex(mdp::GridWorld, a::Union{Symbol})
 end
 
 const MOVEMENTS = Dict(
-	:up    => State(0, 1), 
+	:up    => State(0, 1),
 	:right => State(1, 0),
 	:down  => State(0, -1),
 	:left  => State(-1, 0)
-);	
+);
 
 #= Reward function
 ==================
@@ -131,9 +138,9 @@ In this case the reward function is dependent only on the state, although typica
 *	one possibility would be to store the reward_states as a list of states in which the agent receives a reward, and a corresponding reward_values vector which contains the values of rewards received in those sttes, you could define this in the GridWorld struct
 *	another alternative would be to declare a list of absorbing states, these states have a reward of 0 and other states then have a reward of -1
 =#
-function POMDPs.reward(mdp::GridWorld, s::State, a::Any=nothing)  
-	# currently no check for whether the state is in 𝒮 
-	# so any state valid or not incurs a cost of -1, this is important for bumping off walls, etc. 
+function POMDPs.reward(mdp::GridWorld, s::State, a::Any=nothing)
+	# currently no check for whether the state is in 𝒮
+	# so any state valid or not incurs a cost of -1, this is important for bumping off walls, etc.
 	# define a simple corner goal
 	if s ∈ mdp.absorbing_states
 		return 0
@@ -142,7 +149,7 @@ function POMDPs.reward(mdp::GridWorld, s::State, a::Any=nothing)
 	end
 end
 
-POMDPs.isterminal(mdp::GridWorld, s::State) = s ∈ mdp.absorbing_states 
+POMDPs.isterminal(mdp::GridWorld, s::State) = s ∈ mdp.absorbing_states
 
 #= Distributions
 ================
@@ -162,20 +169,20 @@ use the p_transition parameter as the probability that the agent moves in the sp
 POMDPs.discount(mdp::GridWorld) = mdp.γ
 
 function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
-	
+
 	if reward(mdp, s) == 0 # if the reward is zero, it signifies a goal state
 		return Deterministic(s) 	# goal is absorbing for all actions
 	end
-	
+
 	Nₐ = length(mdp.𝒜)
-	# make allowance for remaining in the current state, hence use size Nₐ + 1 
+	# make allowance for remaining in the current state, hence use size Nₐ + 1
 	# currently not using the next_states dictionary in the mdp container
-	next_states = Vector{State}(undef, Nₐ + 1)  
+	next_states = Vector{State}(undef, Nₐ + 1)
 	probabilities = zeros(Nₐ + 1)
 	# probability of target destination
 	# remaining probability is apportioned equally between remaining actions
-	p_transition = mdp.p_transition 
-	
+	p_transition = mdp.p_transition
+
 	# denote next action and state by a' and s' using \prime
 	# process all actions so that resulting state distribution includes all outcomes
 	for (i, a′) in enumerate(mdp.𝒜)
@@ -191,6 +198,42 @@ function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
 	next_states[1] = s
 	probabilities[1] = 1 - sum(probabilities)
 
-	return SparseCat(next_states, probabilities) 
-	
+	return SparseCat(next_states, probabilities)
+
 end
+
+"""
+    build_probabilistic_model(mdp)
+
+Return a `SparseArray` representing T[s′, a, s], taking into account multiple successor states for action/state pairs.
+"""
+
+function build_probabilistic_model(mdp)
+    P = zeros(mdp.Nₛ, mdp.Nₐ, mdp.Nₛ)
+    sa_pairs =  [repeat(states(mdp), inner=[mdp.Nₐ]) repeat(actions(mdp), outer=[mdp.Nₛ])]
+
+    for sa in eachrow(sa_pairs)
+        s = sa[1]; a = sa[2];
+        if !isterminal(mdp, s)
+            # i in the variable name denotes index
+            si = stateindex(mdp, s)
+            ai = actionindex(mdp, a)
+            ps′ = transition(mdp, s, a)
+            for (s′, p) in weighted_iterator(ps′)
+                if p > 0.0
+                    s′i = stateindex(mdp, s′)
+                    P[s′i, ai, si] += p
+                end
+            end
+        end
+    end
+    return P
+end
+
+mdp = GridWorld(
+    size=(3,3),
+    p_transition=1.0,
+    absorbing_states=[State(1,1)],
+    γ=1.0)
+
+P = build_probabilistic_model(mdp)
