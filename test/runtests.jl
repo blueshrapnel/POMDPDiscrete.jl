@@ -1,7 +1,7 @@
 using SafeTestsets
 
 @safetestset "gridworld tests" begin
-    include("gridworld_test_dynamics.jl")
-    include("gridworld_test_vis.jl")
-    include("gridworld_test_policies.jl")
+    include("test_gridworld_dynamics.jl")
+    include("test_gridworld_vis.jl")
+    include("test_gridworld_stochastic_policy.jl")
 end
