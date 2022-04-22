@@ -1,6 +1,9 @@
 
 #=
 POMDPs includes a function to return a random number generator `RandomPolicy(mdp)``, iterally a random action every time.  For a stationary Stochastic policy we want a constant action distribution given the state.
+
+    Policy abstract type defined in POMDPs.jl/src/policy.jl.  Implement
+        action, updater, value.
 =#
 struct StochasticPolicy{P<:Union{POMDP, MDP}, T<:AbstractMatrix{Float64}, A} <: Policy
 	mdp::P
@@ -15,6 +18,27 @@ function StochasticPolicy(
 	# normalise the state_action_dist ∑_a π(a|s) = 1
 	π = π./sum(π, dims=2)
 	return StochasticPolicy(mdp, π, ordered_actions(mdp))
+end
+
+
+"""
+    action_distribution(policy::StochasticPolicy, x)
+
+Returns the distribution of the ordered actions given the policy and the current state or belief x.
+"""
+function action_distribution(policy::StochasticPolicy, x)
+    xi = stateindex(policy.mdp, x)
+    return  SparseCat(policy.act, policy.π[xi,:])
+end
+
+"""
+    action(policy::StocasticPolicy, x)
+
+Return an action sampled from the action distribution given the policy and the state `x`.
+"""
+
+function action(policy::StochasticPolicy, x::State)
+    return rand(MersenneTwister(), action_distribution(policy, x))
 end
 
 """
@@ -50,4 +74,3 @@ end
 function policy_transition_matrix(mdp::Union{POMDP,MDP}, policy::StochasticPolicy)
     return policy_transition_matrix(mdp, policy.π)
 end
-

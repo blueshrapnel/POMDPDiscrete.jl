@@ -1,9 +1,12 @@
 using POMDPDiscrete
 import POMDPDiscrete.policy_transition_matrix
+import POMDPDiscrete.action_distribution
 
 using POMDPs
-
+import POMDPModelTools.SparseCat
 import POMDPModelTools:ordered_actions
+
+using Random
 
 using Test
 
@@ -59,4 +62,20 @@ end
     @test T ≈ T₂
     # check successor state distribution sums to 1
     @test all(sum(T, dims=2) .≈ 1)
+end
+
+
+@testset "action_distribution and sampling methods" begin
+    mdp = GridWorld(
+        size=(3,7),
+        p_transition=0.6,
+        absorbing_states=State[],
+        γ=1.0)
+    policy = random_stochastic_policy(mdp)
+    rng = MersenneTwister(1234)
+    s0 = rand(rng, initialstate(mdp))
+    a_dist = action_distribution(policy, s0)
+    @test typeof(a_dist) <: SparseCat{<:AbstractArray, <:AbstractArray}
+    @test a_dist.vals == ordered_actions(mdp)
+    @test sum(a_dist.probs) ≈ 1
 end

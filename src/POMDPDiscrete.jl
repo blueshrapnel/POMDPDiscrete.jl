@@ -6,6 +6,7 @@ using POMDPPolicies
 
 using Plots
 using ColorSchemes
+using Random
 
 export
     GridWorld,
