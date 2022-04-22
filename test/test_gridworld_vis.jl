@@ -17,13 +17,14 @@ save_plots = false
     # test plot of the gridworld and agent location
     p = render(mdp, s=s0);
     @test p isa Plots.Plot
-    save_plots ? savefig(p, "test/test_render_agent_location.png") : nothing
+    save_plots ? savefig(p, "plots/render_agent_location.png") : nothing
 end
 
 @testset "policy textual representation" begin
     mdp = GridWorld()
-    policy = POMDPPolicies.RandomPolicy(mdp)
-    @test POMDPDiscrete.policy_grid(mdp, policy) isa Matrix{String}
+    policy = random_stochastic_policy(mdp)
+    policy_text = POMDPDiscrete.policy_grid(mdp, policy)
+    @test policy_text isa Matrix{String}
 end
 
 @testset "successfully creating a policy plot" begin
@@ -34,5 +35,5 @@ end
     random_behaviour = random_stochastic_policy(mdp)
     p = render(mdp, s=s0, policy=random_behaviour);
     @test p isa Plots.Plot
-    save_plots ? savefig(p, "test/test_render_policy.png") : nothing
+    save_plots ? savefig(p, "plots/render_policy.png") : nothing
 end

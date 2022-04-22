@@ -79,7 +79,7 @@ end
     policy_grid(mdp, policy)
     policy_grid(mdp, xmax, ymax)
 
-Return a representation of the policy using unicode arrows stored in a Matrix{String}, where each state is represented by an element of the matrix.
+Return a representation of the policy using unicode arrows stored in a Matrix{String}, where each state is represented by an element of the matrix.  This only shows one action per state, samples distribution to select action.
 """
 function policy_grid(mdp::GridWorld, policy::Policy)
     xmax, ymax = mdp.size
