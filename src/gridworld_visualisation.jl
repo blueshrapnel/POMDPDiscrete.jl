@@ -40,7 +40,7 @@ function plot_grid_world(
 	# plot policy arrows
 	if isnothing(policy)
 		nothing
-	elseif isa(policy, StochasticValuePolicy)
+	elseif isa(policy, StochasticPolicy)
 		GR.setarrowsize(0.5)
 		# column major
 		xs = repeat(1:xmax, 1, ymax) |> vec
@@ -71,8 +71,8 @@ function POMDPModelTools.render(mdp::GridWorld, step=nothing;
     return plot_grid_world(
         mdp::MDP;
         s=s,
-        policy=nothing,
-        title=nothing)
+        policy=policy,
+        title=title)
 end
 
 """

@@ -14,7 +14,7 @@ using Test
 
     uniform_policy = uniform_stochastic_policy(mdp)
     @test sum(uniform_policy.π) ≈ length(mdp.𝒮)
-    for a in ordered_actions(mdp)
+    for a ∈ ordered_actions(mdp)
         i = actionindex(mdp, a)
         @test rand(uniform_policy.π[:,i]) == 1/length(mdp.𝒜)
     end
@@ -49,9 +49,9 @@ end
     Nₐ = length(actions(mdp))
     T₂ = zeros(Nₛ, Nₛ)
     P = POMDPDiscrete.build_probabilistic_model(mdp)
-    for si in 1:Nₛ
-        for s′i in 1:Nₛ
-            for ai in 1:Nₐ
+    for si ∈ 1:Nₛ
+        for s′i ∈ 1:Nₛ
+            for ai ∈ 1:Nₐ
                 T₂[si, s′i] += policy.π[si, ai] * P[s′i, ai, si]
             end
         end
