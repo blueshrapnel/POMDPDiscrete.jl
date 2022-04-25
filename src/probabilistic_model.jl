@@ -3,10 +3,10 @@
 
 Return a 3 dimensional matrix representing P[s′, a, s], taking into account successor state distributions for action/state pairs.
 """
-
 function build_probabilistic_model(mdp::Union{MDP, POMDP})
     Nₐ = length(actions(mdp))
     Nₛ = length(states(mdp))
+    #TODO use SparseArray for P
     P = zeros(Nₛ, Nₐ, Nₛ)
     sa_pairs =  [repeat(states(mdp), inner=[Nₐ]) repeat(actions(mdp), outer=[Nₛ])]
 
