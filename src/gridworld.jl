@@ -139,8 +139,16 @@ In this case the reward function is dependent only on the state, although typica
 *	one possibility would be to store the reward_states as a list of states in which the agent receives a reward, and a corresponding reward_values vector which contains the values of rewards received in those sttes, you could define this in the GridWorld struct
 *	another alternative would be to declare a list of absorbing states, these states have a reward of 0 and other states then have a reward of -1
 =#
+
+"""
+    reward(mdp::GridWorld, s::State, [a::Any])
+
+Returns a reward of -1 for any action `a` taken in state `s` for a `GridWorld` mdp.  If the stsate `s` is in the set of absorbing states, then the reward is zero.  Note the reward is function of the current state only.
+"""
 function POMDPs.reward(mdp::GridWorld, s::State, a::Any=nothing)
 	# currently no check for whether the state is in 𝒮
+    # any action in a terminal state has zero reward
+    # i.e. once in an absorbing states, there are no future returns
 	# so any state valid or not incurs a cost of -1, this is important for bumping off walls, etc.
 	# define a simple corner goal
 	if s ∈ mdp.absorbing_states
@@ -149,6 +157,7 @@ function POMDPs.reward(mdp::GridWorld, s::State, a::Any=nothing)
 		return -1
 	end
 end
+
 
 POMDPs.isterminal(mdp::GridWorld, s::State) = s ∈ mdp.absorbing_states
 
@@ -169,6 +178,12 @@ use the p_transition parameter as the probability that the agent moves in the sp
 # discount factor
 POMDPs.discount(mdp::GridWorld) = mdp.γ
 
+
+"""
+    transition(mdp::GridWorld, s::State, a::Symbol)
+
+Returns the probability distribution of successor states for a `GridWorld` mdp, given the current state `s` and an action `a` selected in that state.
+"""
 function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
 
 	if reward(mdp, s) == 0 # if the reward is zero, it signifies a goal state
