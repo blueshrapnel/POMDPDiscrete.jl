@@ -49,7 +49,29 @@ end
     s0 = rand(rng, initialstate(mdp))
     # test plot of the gridworld and agent location
     random_behaviour = random_stochastic_policy(mdp)
-    p = render(mdp, s=s0, policy=random_behaviour, title="policy plot");
+    p = render(mdp, s=s0, policy=random_behaviour.π, title="policy plot");
     @test p isa Plots.Plot
     save_plots ? savefig(p, "plots/render_policy.png") : nothing
+end
+
+
+@testset "optimal value and policy" begin
+    mdp=GridWorld(
+        size=(4,4),
+        p_transition = 1,
+        absorbing_states=[State(1,1)],
+        γ = 1
+    )
+    V = POMDPDiscrete.value_iteration(mdp)
+
+    # creating greedy stochastic policy from optimal value
+    greedy_policy = POMDPDiscrete.greedy_policy(mdp, V)
+    # for plotting reshape V
+    p = render(
+        mdp,
+        policy=greedy_policy,
+        utility=reshape(V, mdp.size),
+        title="optimal policy");
+    save_plots ? savefig(p, "plots/render_optimal_value_policy.png") : nothing
+
 end
