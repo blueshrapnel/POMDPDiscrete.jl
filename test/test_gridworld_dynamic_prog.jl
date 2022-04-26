@@ -33,6 +33,9 @@ end
               -2 -3 -4 -5;
               -3 -4 -5 -6]
     @test reshape(V, (4,4)) ≈ target
+
+    # creating greedy stochastic policy from optimal value
+    greedy_policy = greedy_policy(mdp, V)
 end
 
 @testset "policy_evaluation" begin

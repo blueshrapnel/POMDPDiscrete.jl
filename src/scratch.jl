@@ -10,9 +10,9 @@ mdp = GridWorld(
     p_transition = 1.0,
     γ = 1.0)
 
-utility = POMDPDiscrete.value_iteration(mdp)
+Vopt = POMDPDiscrete.value_iteration(mdp)
+policy = POMDPDiscrete.greedy_policy(mdp, Vopt)
 
 # test plot of the gridworld and agent location
-render(mdp, s=State(1,1), utility=utility, title="testing")
+render(mdp, s=State(1,1), utility=Vopt, policy=policy)
 
-render(mdp, s=State(1,1))
