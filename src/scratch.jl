@@ -1,18 +1,23 @@
 using POMDPDiscrete
 using POMDPs
 using POMDPModelTools
+using Plots
 
-using Random
 
-mdp = GridWorld(
-    size=(5,7),
-    absorbing_states=[State(1,1)],
-    p_transition = 1.0,
-    γ = 1.0)
+mdp=GridWorld(
+        size=(3,3),
+        p_transition = 0.7,
+        absorbing_states=[State(1,1), State(3,3)],
+        γ = 0.9
+    )
+V = POMDPDiscrete.value_iteration(mdp)
 
-Vopt = POMDPDiscrete.value_iteration(mdp)
-policy = POMDPDiscrete.greedy_policy(mdp, Vopt)
-
-# test plot of the gridworld and agent location
-render(mdp, s=State(1,1), utility=Vopt, policy=policy)
-
+# creating greedy stochastic policy from optimal value
+greedy_policy = POMDPDiscrete.greedy_policy(mdp, V)
+# for plotting reshape V
+p = render(
+    mdp,
+    policy=greedy_policy,
+    utility=reshape(V, mdp.size),
+    title="optimal policy");
+savefig(p, "render_sample_optimal_plot.png")

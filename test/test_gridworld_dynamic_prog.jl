@@ -35,7 +35,35 @@ end
     @test reshape(V, (4,4)) ≈ target
 
     # creating greedy stochastic policy from optimal value
-    greedy_policy = greedy_policy(mdp, V)
+    greedy_policy = POMDPDiscrete.greedy_policy(mdp, V)
+    # :up (1)
+    @test reshape(greedy_policy[:, 1], mdp.size) ≈ [
+        0.25 0  0  0 ;
+        0    0  0  0 ;
+        0    0  0  0 ;
+        0    0  0  0 ]
+
+    # :right (2)
+    @test reshape(greedy_policy[:, 2], mdp.size) ≈[
+        0.25 0  0  0 ;
+        0    0  0  0 ;
+        0    0  0  0 ;
+        0    0  0  0 ]
+
+    # :down (3)
+    @test reshape(greedy_policy[:, 3], mdp.size) ≈ [
+        0.25  1   1   1;
+        0.    0.5 0.5 0.5;
+        0.    0.5 0.5 0.5;
+        0.    0.5 0.5 0.5]
+    # :left (4)
+
+    @test reshape(greedy_policy[:, 4], mdp.size) ≈ [
+        0.25 0.  0.  0. ;
+        1    0.5 0.5 0.5;
+        1    0.5 0.5 0.5;
+        1    0.5 0.5 0.5]
+
 end
 
 @testset "policy_evaluation" begin

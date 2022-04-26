@@ -71,7 +71,7 @@ function value_iteration(mdp::Union{MDP,POMDP})
     Nₛ = length(states(mdp))
     # build a reward matrix with indices R[s',a,s]
     R = get_rewards(mdp)                    # as a column vector
-    R_s_s′= repeat(R, 1, Nₛ)                # R[s, s'] 
+    R_s_s′= repeat(R, 1, Nₛ)                # R[s, s']
     Nₐ = length(actions(mdp))
     P = build_probabilistic_model(mdp)      # only a function of the mdp
     # initialise value function to zero
@@ -115,7 +115,8 @@ end
 # given the state action value for a state, return the best value and actions
 function one_step_lookahead_actions(qₛ)
     best_value = maximum(qₛ)
-    best_actions = findall(qₛ .== best_value)
+    #best_actions = findall(qₛ .≈ best_value)
+    best_actions = findall(qₛ .≈ best_value)
     return best_actions
 end
 
@@ -143,10 +144,10 @@ function greedy_policy(mdp::Union{MDP, POMDP}, V)
     Nₛ = length(states(mdp))
     Nₐ = length(actions(mdp))
     R = get_rewards(mdp)                    # as a column vector
-    R_s_s′= repeat(R, 1, Nₛ)                # R[s, s'] 
+    R_s_s′= repeat(R, 1, Nₛ)                # R[s, s']
     Nₐ = length(actions(mdp))
     P = build_probabilistic_model(mdp)      # only a function of the mdp
-    
+
     π = zeros(Nₛ, Nₐ)
     for si ∈ 1:Nₛ
         qₛ =  one_step_lookahead(si, P, R_s_s′, mdp.γ, V, Nₐ)
@@ -155,5 +156,5 @@ function greedy_policy(mdp::Union{MDP, POMDP}, V)
             π[si, ai] = 1.0/length(best_actions)
         end
     end
-    return StochasticPolicy(mdp, π)
+    return π
 end
