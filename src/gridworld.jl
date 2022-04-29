@@ -8,8 +8,8 @@ holds:
 *	some helper fields
 * 	𝒮::Vector{Int}          	 # state space
 	𝒜::Vector{Int}       	 	 # action space
-	T::Array{Float64, 3}   		# transition function, i.e. probabilistic model Pr [s′, a, s]
-	R::Matrix{Float64}      	# rewards
+	T::Array{Real, 3}   		# transition function, i.e. probabilistic model Pr [s′, a, s]
+	R::Matrix{Real}      	    # rewards
 =#
 
 
