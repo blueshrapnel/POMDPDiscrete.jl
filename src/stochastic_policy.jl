@@ -5,7 +5,7 @@ POMDPs includes a function to return a random number generator `RandomPolicy(mdp
     Policy abstract type defined in POMDPs.jl/src/policy.jl.  Implement
         action, updater, value.
 =#
-struct StochasticPolicy{P<:Union{POMDP, MDP}, T<:AbstractMatrix{Real}, A} <: Policy
+struct StochasticPolicy{P<:Union{POMDP, MDP}, T<:AbstractMatrix{<:Real}, A} <: Policy
 	mdp::P
 	π::T
 	act::Vector{A}
@@ -65,7 +65,7 @@ end
 
 Return a transition matrix given a probabilistic model P[s′, a, s] (calculated using mdp dynamics)) and a policy stochastic π[s, a].
 """
-function policy_transition_matrix(mdp::Union{POMDP,MDP}, π::Matrix{Real})
+function policy_transition_matrix(mdp::Union{POMDP,MDP}, π::Matrix{<:Real})
     Nₛ = length(states(mdp))
     P = build_probabilistic_model(mdp)
     return reduce(hcat, [P[:,:,si]*π[si,:] for si in 1:Nₛ])'

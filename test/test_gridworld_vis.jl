@@ -9,7 +9,7 @@ using Plots
 
 using Test
 
-save_plots = true
+save_plots = false
 
 @testset "succesfully creating a plot" begin
     mdp = GridWorld()
