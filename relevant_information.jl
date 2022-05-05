@@ -21,13 +21,13 @@ struct InformationChannel
  end
 
 
-function relevant_information_policy(channel::InformationChannel, max_iter=50, ε=1e-4, log_base=2)
+function relevant_information_policy(channel::InformationChannel, max_iters=50, ε=1e-4, log_base=2)
     pX =  ones(channel.size_X)/channel.size_X
     Z_x = similar(pX)
     pY_gX = channel.pY_gX
     Q = zeros(channel.size_X, channel.sizeY)
     k = 0
-    for i ∈ ProgressBar(max_iter)
+    for i ∈ 1:max_iters
         
         # real underlying idea is to run
 		# pYgX = dot( Diagonal(pY), .exp(-β * cost) ) # diagonalise pY
@@ -44,6 +44,8 @@ function relevant_information_policy(channel::InformationChannel, max_iter=50, �
         uYgX = log.(pYgX) - log.(repeat(Z_x, n, 1))
         pYgX = exp.(uYgX)
         pY = pYgX *  pX
+
+        # 
     end
     return pYgX, Z_x
 end

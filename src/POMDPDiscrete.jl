@@ -6,7 +6,10 @@ using POMDPPolicies
 
 using Plots
 using ColorSchemes
+
 using Random
+
+using ProgressBars
 
 export
     GridWorld,
