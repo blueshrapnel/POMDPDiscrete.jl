@@ -158,3 +158,26 @@ function greedy_policy(mdp::Union{MDP, POMDP}, V)
     end
     return π
 end
+
+
+function update_state_action_value!(mdp, π, Q)
+    # Q: assume columns are action (output), rows are states (input)
+    # π: assume columns are action (output), rows are states (input)  
+    Nₛ, Nₐ = size(π)
+    for si ∈ 1:Nₛ
+        for ai ∈ 1:Nₐ
+            ps′ = transition(mdp, si, ai)
+            for (s′, p) in weighted_iterator(ps′)
+                if p > 0.0
+                    s′i = stateindex(mdp, s′)
+                    q_si_s′i = 
+                end    
+                Q[si, ai] = sum(P[:,ai,si].*(R_s_s′[si, :] + mdp.γ*V))
+            end
+        end
+        best_value = maximum(qₛ)
+        Δ = max(Δ, abs(V[si] - best_value))
+        V[si] = best_value
+    end
+
+end
