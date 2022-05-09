@@ -3,6 +3,9 @@ using POMDPs
 using POMDPModelTools
 using Plots
 
+import POMDPDiscrete.InformationChannel
+import POMDPDiscrete.relevant_information_policy
+
 
 mdp=GridWorld(
         size=(3,3),
@@ -14,10 +17,15 @@ V = POMDPDiscrete.value_iteration(mdp)
 
 # creating greedy stochastic policy from optimal value
 greedy_policy = POMDPDiscrete.greedy_policy(mdp, V)
+
+channel = InformationChannel(mdp)
+
+RI_policy, Z = POMDPDiscrete.relevant_information_policy(channel, mdp)
+
 # for plotting reshape V
 p = render(
     mdp,
-    policy=greedy_policy,
+    policy=RI_policy,
     utility=reshape(V, mdp.size),
-    title="optimal policy");
-savefig(p, "render_sample_optimal_plot.png")
+    title="relevant information policy");
+savefig(p, "render_sample_RI_plot.png")

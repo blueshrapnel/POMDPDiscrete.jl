@@ -67,7 +67,7 @@ end
 
 Find the optimal value function for an agent acting greedily.
 """
-function value_iteration(mdp::Union{MDP,POMDP})
+function value_iteration(mdp::Union{MDP,POMDP}; ε=1e-4 )
     Nₛ = length(states(mdp))
     # build a reward matrix with indices R[s',a,s]
     R = get_rewards(mdp)                    # as a column vector
@@ -76,7 +76,6 @@ function value_iteration(mdp::Union{MDP,POMDP})
     P = build_probabilistic_model(mdp)      # only a function of the mdp
     # initialise value function to zero
     V = initialise_vector(Nₛ)
-    ε = 0.0001
     while true
         qₛ = zeros(Nₐ)
         Δ = 0
@@ -161,23 +160,28 @@ end
 
 
 function update_state_action_value!(mdp, π, Q)
+    # TODO make this is MDP diagnostic
     # Q: assume columns are action (output), rows are states (input)
-    # π: assume columns are action (output), rows are states (input)  
-    Nₛ, Nₐ = size(π)
-    for si ∈ 1:Nₛ
-        for ai ∈ 1:Nₐ
-            ps′ = transition(mdp, si, ai)
-            for (s′, p) in weighted_iterator(ps′)
-                if p > 0.0
-                    s′i = stateindex(mdp, s′)
-                    q_si_s′i = 
-                end    
-                Q[si, ai] = sum(P[:,ai,si].*(R_s_s′[si, :] + mdp.γ*V))
+    # π: assume columns are action (output), rows are states (input)
+    # Nₛ, Nₐ = size(π)
+    Nₛ = length(states(mdp))
+    Nₐ = length(actions(mdp))
+    R = get_rewards(mdp)                    # as a column vector
+    R_s_s′= repeat(R, 1, Nₛ)                # R[s, s']
+    for si ∈ 1:Nₛ, ai ∈ 1:Nₐ
+        q = 0                              # outer loop accumulator
+        ps′ = transition(mdp, si, ai)
+        for (s′, p) in weighted_iterator(ps′)
+            if p > 0.0
+                s′i = stateindex(mdp, s′)
+                #=for a′i ∈ 1:Nₐ
+                    # calcuate future value weighted by policy
+                    # make MDP diagnostic by using `action_distribution` method?
+                    qᵢ += π[s′i, a′i] * Q[s′i, a′i]
+                end =#
+                q += R_s_s′[si, s′i] + mdp.γ * sum(π[s′i, :] .* Q[s′i, :])
             end
         end
-        best_value = maximum(qₛ)
-        Δ = max(Δ, abs(V[si] - best_value))
-        V[si] = best_value
+        Q[si, ai] = q
     end
-
 end
