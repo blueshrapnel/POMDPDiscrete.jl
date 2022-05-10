@@ -8,9 +8,9 @@ import POMDPDiscrete.relevant_information_policy
 
 
 mdp=GridWorld(
-        size=(3,3),
-        p_transition = 1,
-        absorbing_states=[State(1,1)],
+        size=(5,5),
+        p_transition = 0.7,
+        absorbing_states=[State(1,1), State(5,5)],
         γ = 0.9
     )
 V = POMDPDiscrete.value_iteration(mdp)
@@ -28,7 +28,7 @@ p = render(
     mdp,
     policy=RI_policy,
     utility=reshape(V, mdp.size),
-    title="$β relevant information policy");
-savefig(p, "render_sample_RI_plot.png")
+    title="β: $β RI policy");
+savefig(p, "sample_RI_policy_plot.png")
 
 display(RI_policy)

@@ -51,6 +51,7 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
         # for higher precision use BigFloat
         # convert(Array{BigFloat}, Q)
 
+        # if Qs get too large, then work through log Q
         # uYgX = log.(repeat(pY', Nₓ, 1)) + β * Q
         # pYgX = exp.(uYgX)
         pYgX = repeat(pY', Nₓ, 1) .* exp.(β * Q)

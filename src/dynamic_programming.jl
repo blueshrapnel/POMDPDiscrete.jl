@@ -179,7 +179,7 @@ function update_state_action_value!(mdp, π, Q)
                     # make MDP diagnostic by using `action_distribution` method?
                     qᵢ += π[s′i, a′i] * Q[s′i, a′i]
                 end =#
-                q += R_s_s′[si, s′i] + mdp.γ * sum(π[s′i, :] .* Q[s′i, :])
+                q += p * (R_s_s′[si, s′i] + mdp.γ * sum(π[s′i, :] .* Q[s′i, :]))
             end
         end
         Q[si, ai] = q
