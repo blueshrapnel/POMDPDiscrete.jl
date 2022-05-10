@@ -21,9 +21,7 @@ using Test
     @test sum(RI_policy) ≈ length(mdp.𝒮)
 
     # checking against values optained using python GridFour code
-    display(RI_policy)
 
-    display(Q)
     # results of Q calculated on a similar grid in Python code
     # up and down actions switched
     gridFour_Q =([
