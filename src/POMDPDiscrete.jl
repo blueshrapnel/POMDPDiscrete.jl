@@ -8,6 +8,7 @@ using Plots
 using ColorSchemes
 
 using Random
+using LinearAlgebra
 
 export
     GridWorld,
