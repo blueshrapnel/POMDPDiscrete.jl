@@ -98,6 +98,7 @@ inbounds(mdp::GridWorld, s::State) = 1 ≤ s.x ≤ mdp.size[1] && 1 ≤ s.y ≤ 
 POMDPs.states(mdp::GridWorld) = mdp.𝒮
 
 POMDPs.stateindex(mdp::GridWorld, s::State) = LinearIndices(mdp.ci)[s.x, s.y]
+si2s(mdp::GridWorld, si) = State(mdp.ci[si][1], mdp.ci[si][2])
 
 POMDPs.initialstate(mdp::GridWorld) = Uniform(mdp.𝒮)# Deterministic(State(4,4))
 
@@ -184,10 +185,17 @@ POMDPs.discount(mdp::GridWorld) = mdp.γ
 
 Returns the probability distribution of successor states for a `GridWorld` mdp, given the current state `s` and an action `a` selected in that state.
 """
+function POMDPs.transition(mdp::GridWorld, si::Int, ai::Int)
+    s = si2s(mdp, si)
+    a = ordered_actions(mdp)[ai]
+    POMDPs.transition(mdp, s, a)
+end
+
 function POMDPs.transition(mdp::GridWorld, s::State, a::Symbol)
 
-	if reward(mdp, s) == 0 # if the reward is zero, it signifies a goal state
-		return Deterministic(s) 	# goal is absorbing for all actions
+	# if reward(mdp, s) == 0 # if the reward is zero, it signifies a goal state
+	if s ∈ mdp.absorbing_states
+        return Deterministic(s) 	# goal is absorbing for all actions
 	end
 
 	Nₐ = length(mdp.𝒜)
