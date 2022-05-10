@@ -20,7 +20,7 @@ H(Y|X) = -\sum_{x, y} p(x,y) \log p(y|x)\leq (H(Y))
 @doc raw"""
     mutual_information
 
-The mutual information ``I(X;Y)`` is the measure of the mutual dependence between the variables X and Y, it quantifies the amount of information obtained about one variable by observing another variable.  
+The mutual information ``I(X;Y)`` is the measure of the mutual dependence between the variables X and Y, it quantifies the amount of information obtained about one variable by observing another variable.
 
 ```math
 I(X;Y) = H(Y) - H(Y|X) = -\sum_{x} p(x)\sum_{y}p(y|x) \log \frac{p(y|x)}{p(y)}
@@ -43,12 +43,12 @@ How much information X gives about Y given the knowledge of the value of Z I(X;Y
 
 Divergence between two distributions.  An important use case is that mutual information between two variables is the divergence between their joint probabilities and the product of their marginals.
 ``` math
-    D_{KL}[p(x)\Vert q(x)] = \sum_x p(x) \log \frac{p(x)}{q(x)} 
+    D_{KL}[p(x)\Vert q(x)] = \sum_x p(x) \log \frac{p(x)}{q(x)}
 ```
 """
 
 
-@doc """
+@doc raw"""
 
 Rate distortion is a constrained convex optimisation problem
 ```math
