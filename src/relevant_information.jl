@@ -37,36 +37,35 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
     Δ = 0
     for i ∈ 1:max_iters
 
-        # real underlying idea is to run
-		# pYgX = dot( Diagonal(pY), .exp(-β * cost) ) # diagonalise pY
-		# Z = sum(pYgX, dims=1)
-		# pR = dot(pYgX, Diagonal(1/Z))
-		# but this doesn't work when beta is really large
-		# so instead we manipulate logs of p(y|x).
-
-        # TODO - check whether problems arise 0 probability masses
+        # TODO - check whether problems arise 0 probability masses Nan, Inf, etc.
         # TODO - move blahut arimoto step into separate function
         pY = pYgX' * pX     # marginalize to get probability distribution of output
 
         # for higher precision use BigFloat
         # convert(Array{BigFloat}, Q)
 
-        # if Qs get too large, then work through log Q
+        # if Qs get too large, then manipulate logs of β Q
         # uYgX = log.(repeat(pY', Nₓ, 1)) + β * Q
         # pYgX = exp.(uYgX)
-        pYgX = repeat(pY', Nₓ, 1) .* exp.(β * Q)
-        Z_x = sum(pYgX, dims=2)
+        # Z_x = sum(pYgX, dims=2)
         # uYgX = log.(pYgX) - log.(repeat(Z_x, Nₓ, 1))
         # pYgX = exp.(uYgX)
+
+        # instead of repeat could use diagonal
+        # pYgX = dot( Diagonal(pY), .exp(β * Q) ) # diagonalise pY
+        pYgX = repeat(pY', Nₓ, 1) .* exp.(β * Q)
+        Z_x = sum(pYgX, dims=2)
         pYgX = pYgX ./ Z_x
 
 
         # update the Q function
+        Q_old = copy(Q)
         update_state_action_value!(mdp, pYgX, Q)
-
-        #=  TODO - check for convergence instead of only #iterations
-        Δ = DKL between two consecutive policies
+        Δ = norm(Q - Q_old)         # p-norm defaults to p=2
         Δ < ε && break
+
+        #=  TODO - check for convergence using policy as well?
+        Δ = DKL between two consecutive policies
         =#
     end
 
