@@ -28,7 +28,7 @@ struct InformationChannel
  end
 
 
-function relevant_information_policy(channel::InformationChannel, mdp::MDP, β=10, max_iters=50, ε=1e-4, log_base=2)
+function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=10, max_iters=50, ε=1e-4, log_base=2)
     Nₓ = channel.size_X
     pX =  ones(Nₓ)/Nₓ
     Z_x = similar(pX)
@@ -47,11 +47,18 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP, β=1
         # TODO - check whether problems arise 0 probability masses
         # TODO - move blahut arimoto step into separate function
         pY = pYgX' * pX     # marginalize to get probability distribution of output
-        uYgX = log.(repeat(pY', Nₓ, 1)) - β * Q
-        pYgX = exp.(uYgX)
-        Z_x = sum(pYgX, dims=1)
-        uYgX = log.(pYgX) - log.(repeat(Z_x, Nₓ, 1))
-        pYgX = exp.(uYgX)
+
+        # for higher precision use BigFloat
+        # convert(Array{BigFloat}, Q)
+
+        # uYgX = log.(repeat(pY', Nₓ, 1)) + β * Q
+        # pYgX = exp.(uYgX)
+        pYgX = repeat(pY', Nₓ, 1) .* exp.(β * Q)
+        Z_x = sum(pYgX, dims=2)
+        # uYgX = log.(pYgX) - log.(repeat(Z_x, Nₓ, 1))
+        # pYgX = exp.(uYgX)
+        pYgX = pYgX ./ Z_x
+
 
         # update the Q function
         update_state_action_value!(mdp, pYgX, Q)
@@ -62,5 +69,11 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP, β=1
         =#
     end
 
+    remove_negligible_values!(pYgX)
     return pYgX, Z_x
+end
+
+function remove_negligible_values!(values, threshold=1e-6)
+    indices = findall(x->x<threshold, values)
+    values[indices] .= 0
 end
