@@ -36,13 +36,14 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
     Q = zeros(Nₓ, channel.size_Y)
     Δ = 0
     for i ∈ 1:max_iters
-
+        # TODO - correct for log_base - currently using e^ not 2^
         # TODO - check whether problems arise 0 probability masses Nan, Inf, etc.
         # TODO - move blahut arimoto step into separate function
+        # TODO - can we refine a Q instead of initialising to zero?
         pY = pYgX' * pX     # marginalize to get probability distribution of output
 
         # for higher precision use BigFloat
-        # convert(Array{BigFloat}, Q)
+        convert(Array{BigFloat}, Q)
 
         # if Qs get too large, then manipulate logs of β Q
         # uYgX = log.(repeat(pY', Nₓ, 1)) + β * Q
@@ -55,6 +56,7 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
         # pYgX = dot( Diagonal(pY), .exp(β * Q) ) # diagonalise pY
         pYgX = repeat(pY', Nₓ, 1) .* exp.(β * Q)
         Z_x = sum(pYgX, dims=2)
+
         pYgX = pYgX ./ Z_x
 
 
@@ -69,11 +71,13 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
         =#
     end
 
-    remove_negligible_values!(pYgX)
-    return pYgX, Z_x
+    remove_negligible_values_normalise!(pYgX) # then renormalise
+    return pYgX, Q, Z_x
 end
 
-function remove_negligible_values!(values, threshold=1e-6)
+# neglible threshold specifed in parameters.jl
+function remove_negligible_values_normalise!(values, threshold=negligible_threshold)
     indices = findall(x->x<threshold, values)
     values[indices] .= 0
+    values ./= sum(values, dims=2)
 end

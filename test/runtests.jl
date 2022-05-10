@@ -10,3 +10,7 @@ end
     include("test_gridworld_stochastic_policy.jl")
     include("test_gridworld_dynamics.jl")
 end
+
+@safetestset "relevant_information tests" begin
+    include("test_relevant_information.jl")
+end
