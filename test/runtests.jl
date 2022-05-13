@@ -14,3 +14,7 @@ end
 @safetestset "relevant_information tests" begin
     include("test_relevant_information.jl")
 end
+
+@safetestset "information utilities" begin
+    include("test_information_utils.jl")
+end

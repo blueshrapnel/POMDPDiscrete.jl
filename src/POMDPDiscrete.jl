@@ -27,6 +27,7 @@ include("stochastic_policy.jl")
 include("probabilistic_model.jl")
 include("dynamic_programming.jl")
 include("relevant_information.jl")
+include("information_utils.jl")
 
 
 end

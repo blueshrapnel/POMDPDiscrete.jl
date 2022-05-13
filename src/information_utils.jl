@@ -11,6 +11,8 @@ The units of information measures depend on the base of the logarithms applied: 
 @doc raw"""
 We apply the usual convention of setting ``0 \log 0 = 0`` as by continuity, ``x \log x \to 0`` for ``x \to 0`` from above.  Extending this continuity argument,  a similar convention as adopted such that ``0 \log \frac{0}{r} = 0`` and ``p \log \frac{p}{0}=\infty`` for all ``r\geq 0`` and ``s>0``.
 """
+
+# see package LogExpFunctions.jl
 # https://github.com/JuliaStats/LogExpFunctions.jl/blob/master/src/basicfuns.jl
 function xlog2x(x::Number)
     result = x * log2(x)
@@ -19,7 +21,7 @@ end
 
 function xlog2y(x::Number, y::Number)
     result = x * log2(y)
-    return iszero(x) && !isnan(y) ? zero(result) : result
+    return iszero(y) || (iszero(x) && !isnan(y)) ? zero(result) : result
 end
 
 
@@ -34,7 +36,10 @@ H(X) = -\sum_{x} p(x) \log(p(x))
 """
 
 function compute_entropy(pX)
-    entropy = sum(xlog2x.(pX))
+    # assume that sum(pX) == 1, avoid performance hit on defensive programming
+    # another option could be to use a Distribution or other relevant type
+    # @assert sum(pX) ≈ 1
+    entropy = -sum(xlog2x.(pX))
     # Make sure we don't return -0.0
 	return entropy + 0.0
 end
