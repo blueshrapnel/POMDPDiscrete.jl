@@ -1,6 +1,11 @@
 #=
 Relevant information
 
+What is the minimum level of information to act at a certain level?  We can also answer the
+question of what that action looks like.  We view the perception-action loop as an information
+channel.  Information flows from the environment to the agent via sensors, and from the agent
+to the environment through actuators.
+
 =#
 
 @doc raw"""

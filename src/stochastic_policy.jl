@@ -1,10 +1,14 @@
 
-#=
+"""
+    StochasticPolicy(mdp, policy_matrix)
+
+Why do we want a stochastic policy?  Acting optimally in all situations comes with a cost, a stochastic policy allows the agent to save information bandwidth and/or storage by accepting some loss of optimality in some situations
+
 POMDPs includes a function to return a random number generator `RandomPolicy(mdp)``, iterally a random action every time.  For a stationary Stochastic policy we want a constant action distribution given the state.
 
     Policy abstract type defined in POMDPs.jl/src/policy.jl.  Implement
         action, updater, value.
-=#
+"""
 struct StochasticPolicy{P<:Union{POMDP, MDP}, T<:AbstractMatrix{<:Real}, A} <: Policy
 	mdp::P
 	π::T
