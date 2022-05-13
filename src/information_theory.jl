@@ -1,5 +1,30 @@
 @doc raw"""
-    entropy
+Information Theory Utilities
+
+Methods to calculate information measures on probability distributions.
+See also `InformationMeasures.jl`: @Tchanders on [github](https://github.com/Tchanders/InformationMeasures.jl).
+
+The units of information measures depend on the base of the logarithms applied: logarithm to base 2 results in units of bits, whereas using the natural logarithm (to base e) results in units of nats.  In this work all information measures are reported in units of bits.  According to the Julia documentation, "If b is a power of 2 or 10, log2 or log10 should be used, as these will typically be faster and more accurate. "  Thus in this code we aim to use `log2` and the corresponding `exp2` functions to calculate logarithms and exponentials.
+
+"""
+
+@doc raw"""
+We apply the usual convention of setting ``0 \log 0 = 0`` as by continuity, ``x \log x \to 0`` for ``x \to 0`` from above.  Extending this continuity argument,  a similar convention as adopted such that ``0 \log \frac{0}{r} = 0`` and ``p \log \frac{p}{0}=\infty`` for all ``r\geq 0`` and ``s>0``.
+"""
+# https://github.com/JuliaStats/LogExpFunctions.jl/blob/master/src/basicfuns.jl
+function xlog2x(x::Number)
+    result = x * log2(x)
+    return iszero(x) ? zero(result) : result
+end
+
+function xlog2y(x::Number, y::Number)
+    result = x * log2(y)
+    return iszero(x) && !isnan(y) ? zero(result) : result
+end
+
+
+@doc raw"""
+    compute_entropy(pX)
 
 Shannon entropy of a random variable ``H(X)`` is the average amount of information gained when you determine a random variable's value, or the inherent level of uncertainty in the possible outcomes of the variable.
 
@@ -7,6 +32,14 @@ Shannon entropy of a random variable ``H(X)`` is the average amount of informati
 H(X) = -\sum_{x} p(x) \log(p(x))
 ```
 """
+
+function compute_entropy(pX)
+    entropy = sum(xlog2x.(pX))
+    # Make sure we don't return -0.0
+	return entropy + 0.0
+end
+
+
 
 @doc raw"""
     conditional_entropy
