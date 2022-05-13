@@ -1,4 +1,4 @@
-#=
+"""
 Relevant information
 
 What is the minimum level of information to act at a certain level?  We can also answer the
@@ -6,7 +6,7 @@ question of what that action looks like.  We view the perception-action loop as 
 channel.  Information flows from the environment to the agent via sensors, and from the agent
 to the environment through actuators.
 
-=#
+"""
 
 @doc raw"""
 
@@ -33,7 +33,7 @@ struct InformationChannel
  end
 
 
-function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=10, max_iters=50, ε=1e-4, log_base=2)
+function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=10, max_iters=50, ε=1e-4)
     Nₓ = channel.size_X
     pX =  ones(Nₓ)/Nₓ
     Z_x = similar(pX)
@@ -41,7 +41,6 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
     Q = zeros(Nₓ, channel.size_Y)
     Δ = 0
     for i ∈ 1:max_iters
-        # TODO - correct for log_base - currently using e^ not 2^
         # TODO - check whether problems arise 0 probability masses Nan, Inf, etc.
         # TODO - move blahut arimoto step into separate function
         # TODO - can we refine a Q instead of initialising to zero?
@@ -59,7 +58,7 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
 
         # instead of repeat could use diagonal
         # pYgX = dot( Diagonal(pY), .exp(β * Q) ) # diagonalise pY
-        pYgX = repeat(pY', Nₓ, 1) .* exp.(β * Q)
+        pYgX = repeat(pY', Nₓ, 1) .* exp2.(β * Q)
         Z_x = sum(pYgX, dims=2)
 
         pYgX = pYgX ./ Z_x
