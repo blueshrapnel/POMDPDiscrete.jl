@@ -25,35 +25,53 @@ function xlog2y(x::Number, y::Number)
 end
 
 
-@doc raw"""
-    compute_entropy(pX)
 
-Shannon entropy of a random variable ``H(X)`` is the average amount of information gained when you determine a random variable's value, or the inherent level of uncertainty in the possible outcomes of the variable.
+@doc raw"""
+    entropy(pX)
+
+Shannon entropy of a random variable ``H(X)`` is the average amount of information gained when you determine a random variable's value, or the inherent level of uncertainty in the possible outcomes of the variable.  The same method can be used to calculate the entropy of the joint distribution of a pair of random variables.
 
 ```math
 H(X) = -\sum_{x} p(x) \log(p(x))
+H(X, Y) = -\sum_{x, y} p(x,y) \log(p(x,y))
 ```
 """
 
-function compute_entropy(pX)
+function entropy(pX)
     # assume that sum(pX) == 1, avoid performance hit on defensive programming
     # another option could be to use a Distribution or other relevant type
     # @assert sum(pX) ≈ 1
-    entropy = -sum(xlog2x.(pX))
-    # Make sure we don't return -0.0
-	return entropy + 0.0
+    return -sum(xlog2x.(pX))
+    # if returning -0.0 is a problem then return entropy + 0.0
 end
 
 
 
 @doc raw"""
-    conditional_entropy
+    conditional_entropy (pY_X, pX)
 
-Average reduction in uncertainty of Y when observing X.
+Average reduction in uncertainty of Y when observing X.  This is the expected value of the entropy of the conditional distributions averaged over the conditioning random variable.
 ```math
-H(Y|X) = -\sum_{x, y} p(x,y) \log p(y|x)\leq (H(Y))
+\begin{aligned}
+H(Y|X) &= -\sum_{x, y} p(x,y) H(Y|X=x) \\
+&= -sum_x p(x)\sum_y p(y|x) \log p(y|x) \\
+&= \mathbb{E} \log p(Y|X)
+\end{aligned}
 ```
+Also, ``H(X,Y) = H(X) + H(Y|X)`` and the corollary, ``H(X,Y|Z) = H(X|Z + H(Y|,X,Z)) .  See Thomas and Cover section 2.2.
+
 """
+function conditional_entropy(pY_X, pX)
+    #=
+      conditional variable indexed by columns
+      assuming p(X,Y) joint distribution with:
+      X indexed by column, pX = sum(pXY, dims=1) pX is a row vector, sum columns
+      Y indexed by row, pY = sum(pXY, dims=2) pY is a column vector, sum rows
+    =#
+    pX = convert.(AbstractFloat, pX) |> vec
+    HY_X = -sum(xlog2x.(pY_X), dims=1) * pX
+   return HY_X[]
+end
 
 @doc raw"""
     mutual_information
