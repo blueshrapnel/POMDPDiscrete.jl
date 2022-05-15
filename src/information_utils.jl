@@ -35,6 +35,8 @@ Shannon entropy of a random variable ``H(X)`` is the average amount of informati
 H(X) = -\sum_{x} p(x) \log(p(x))
 H(X, Y) = -\sum_{x, y} p(x,y) \log(p(x,y))
 ```
+
+pX : defines p(x), shape (dim_X, )
 """
 
 function entropy(pX)
@@ -60,6 +62,9 @@ H(Y|X) &= -\sum_{x, y} p(x,y) H(Y|X=x) \\
 ```
 Also, ``H(X,Y) = H(X) + H(Y|X)`` and the corollary, ``H(X,Y|Z) = H(X|Z + H(Y|,X,Z)) .  See Thomas and Cover section 2.2.
 
+pY_X : defines conditional probablity p(Y|x), shape (dim_Y, dim_X)
+pX : defines p(x), shape (dim_X, )
+
 """
 function conditional_entropy(pY_X, pX)
     #=
@@ -74,14 +79,56 @@ function conditional_entropy(pY_X, pX)
 end
 
 @doc raw"""
-    mutual_information
+    KL_divergence()
+
+The Kullback-Leibler (KL) Divergence between two distributions, ``p(X)`` and ``q(X)``.  This is also known as the relative entropy.  An important use case is the mutual information between two variables as it is the KL divergence between their joint probabilities and the product of their marginals.
+``` math
+    \begin{aligned}
+    D_{KL}[p(x)\Vert q(x)] &= \mathbb{E}_p[\log \frac{p(x)}{q(x)}]
+    &= \sum_x p(x) \log \frac{p(x)}{q(x)}
+    \end{aligned}
+```
+
+    pX : defines p(x), shape (dim_X, )
+    qX : defines q(x), shape (dim_X, )
+"""
+function KL_divergence(pX, qX)
+    # should test that size(pX) == size(qX)
+    # potential for divide by zero errors
+    KL = sum(xlog2y.(pX, pX./qX))
+    return KL
+end
+
+
+@doc raw"""
+    mutual_information(pXY)
+
+Compute the mutual information between two random variables, X and Y given either the joint distribution ``p(x,y)`` or the conditional distribution ``p(y|x)`` and the marginal ``p(x)``.
 
 The mutual information ``I(X;Y)`` is the measure of the mutual dependence between the variables X and Y, it quantifies the amount of information obtained about one variable by observing another variable.
 
 ```math
 I(X;Y) = H(Y) - H(Y|X) = -\sum_{x} p(x)\sum_{y}p(y|x) \log \frac{p(y|x)}{p(y)}
 ```
+pXY : defines the joint distribution p(x,y), shape (dim_Y, dim_X)
 """
+# calculate mutual information given the joint distribution
+function mutual_information(pXY)
+    pX = sum(pXY, dims=1)  # row vector
+    pY = sum(pXY, dims=2)  # column vector
+    return KL_divergence(pXY, pY * pX)
+end
+
+"""
+calculate mutual information given a conditional and a marginal distribution
+pY_X : defines conditional probablity p(Y|x), shape (dim_Y, dim_X)
+pX : defines p(x), shape (dim_X, )
+"""
+function mutual_information(pY_X, pX)
+    pY = pY_X * pX
+    pX = convert.(AbstractFloat, pX)
+    return sum(xlog2y.(pY_X, pY_X ./pY) * pX)
+end
 
 @doc raw"""
     conditional_mutual_information
@@ -92,15 +139,6 @@ How much information X gives about Y given the knowledge of the value of Z I(X;Y
     I(X;Y) = H(Y) - H(Y|X) = -\sum_{x} p(x)\sum_{y}p(y|x) \log \frac{p(y|x)}{p(y)}
     ```
 
-"""
-
-@doc raw"""
-    kullback_leibler_divergence
-
-Divergence between two distributions.  An important use case is that mutual information between two variables is the divergence between their joint probabilities and the product of their marginals.
-``` math
-    D_{KL}[p(x)\Vert q(x)] = \sum_x p(x) \log \frac{p(x)}{q(x)}
-```
 """
 
 
