@@ -18,55 +18,49 @@ Relevant information captures the information from the world (state space) which
 
 """
 
-struct InformationChannel
-    size_X::Int
-    size_Y::Int
-    pYgX  # conditional probability p_Y|X
- end
 
-
- function InformationChannel(mdp::MDP)
+function InformationChannel(mdp::MDP)
     size_X = length(states(mdp))
     size_Y = length(actions(mdp))
-    pYgX = uniform_stochastic_policy(mdp).π
-    return InformationChannel(size_X, size_Y, pYgX)
- end
+    pY_X = uniform_stochastic_policy(mdp).π
+    return InformationChannel(size_X, size_Y, pY_X)
+end
 
 
 function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=10, max_iters=50, ε=1e-4)
     Nₓ = channel.size_X
     pX =  ones(Nₓ)/Nₓ
     Z_x = similar(pX)
-    pYgX = channel.pYgX
+    pY_X = channel.pY_X
     Q = zeros(Nₓ, channel.size_Y)
     Δ = 0
     for i ∈ 1:max_iters
         # TODO - check whether problems arise 0 probability masses Nan, Inf, etc.
         # TODO - move blahut arimoto step into separate function
         # TODO - can we refine a Q instead of initialising to zero?
-        pY = pYgX' * pX     # marginalize to get probability distribution of output
+        pY = pY_X' * pX     # marginalize to get probability distribution of output
 
         # for higher precision use BigFloat
         convert(Array{BigFloat}, Q)
 
         # if Qs get too large, then manipulate logs of β Q
-        # uYgX = log.(repeat(pY', Nₓ, 1)) + β * Q
-        # pYgX = exp.(uYgX)
-        # Z_x = sum(pYgX, dims=2)
-        # uYgX = log.(pYgX) - log.(repeat(Z_x, Nₓ, 1))
-        # pYgX = exp.(uYgX)
+        # uY_X = log.(repeat(pY', Nₓ, 1)) + β * Q
+        # pY_X = exp.(uY_X)
+        # Z_x = sum(pY_X, dims=2)
+        # uY_X = log.(pY_X) - log.(repeat(Z_x, Nₓ, 1))
+        # pY_X = exp.(uY_X)
 
         # instead of repeat could use diagonal
-        # pYgX = dot( Diagonal(pY), .exp(β * Q) ) # diagonalise pY
-        pYgX = repeat(pY', Nₓ, 1) .* exp2.(β * Q)
-        Z_x = sum(pYgX, dims=2)
+        # pY_X = dot( Diagonal(pY), .exp(β * Q) ) # diagonalise pY
+        pY_X = repeat(pY', Nₓ, 1) .* exp2.(β * Q)
+        Z_x = sum(pY_X, dims=2)
 
-        pYgX = pYgX ./ Z_x
+        pY_X = pY_X ./ Z_x
 
 
         # update the Q function
         Q_old = copy(Q)
-        update_state_action_value!(mdp, pYgX, Q)
+        update_state_action_value!(mdp, pY_X, Q)
         Δ = norm(Q - Q_old)         # p-norm defaults to p=2
         Δ < ε && break
 
@@ -75,8 +69,8 @@ function relevant_information_policy(channel::InformationChannel, mdp::MDP; β=1
         =#
     end
 
-    remove_negligible_values_normalise!(pYgX) # then renormalise
-    return pYgX, Q, Z_x
+    remove_negligible_values_normalise!(pY_X) # then renormalise
+    return pY_X, Q, Z_x
 end
 
 # neglible threshold specifed in parameters.jl

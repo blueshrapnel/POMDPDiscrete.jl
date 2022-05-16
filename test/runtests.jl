@@ -17,4 +17,5 @@ end
 
 @safetestset "information utilities" begin
     include("test_information_utils.jl")
+    #include("test_channel_capacity.jl")
 end

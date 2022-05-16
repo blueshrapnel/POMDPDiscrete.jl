@@ -135,9 +135,6 @@ end
 
 How much information X gives about Y given the knowledge of the value of Z I(X;Y|Z).
 
-    ```math
-    I(X;Y) = H(Y) - H(Y|X) = -\sum_{x} p(x)\sum_{y}p(y|x) \log \frac{p(y|x)}{p(y)}
-    ```
 
 """
 
