@@ -1,4 +1,4 @@
-@doc raw"""
+"""
 Information Theory Utilities
 
 Methods to calculate information measures on probability distributions.
@@ -105,7 +105,7 @@ end
 
 Compute the mutual information between two random variables, X and Y given either the joint distribution ``p(x,y)`` or the conditional distribution ``p(y|x)`` and the marginal ``p(x)``.
 
-The mutual information ``I(X;Y)`` is the measure of the mutual dependence between the variables X and Y, it quantifies the amount of information obtained about one variable by observing another variable.
+The mutual information ``I(X;Y)`` is the measure of the mutual dependence between the variables X and Y, it quantifies the amount of information (in bits) obtained about one variable by observing another variable.
 
 ```math
 I(X;Y) = H(Y) - H(Y|X) = -\sum_{x} p(x)\sum_{y}p(y|x) \log \frac{p(y|x)}{p(y)}
