@@ -4,18 +4,19 @@ struct InformationChannel
     pY_X  # conditional probability that characterises the channel p_Y|X
  end
 
-# TODO check consistency of order of input and output variables
+# check consistency of order of input and output variables
+# use a naming convention so that X is input and Y is output
 # empowerment A --> S - pY_X : shape (dim_Y, dim_X) policy shape (dim_S, dim_a)
 # mutual information - pY_X : shape (dim_Y, dim_X)
 # relevant information S --> A - pY_X : shape (dim_X, dim_Y)
 # information bottleneck ???
-function InformationChannel(pY_X)
+function InformationChannel(p_X)
     size_Y, size_X = size(pY_X)
     InformationChannel(size_X, size_Y, pY_X)
 end
 
-@doc raw """
- channel_capacity(channel, r, q)
+@doc raw"""
+    channel_capacity(channel, r, q)
 
 Computes ...the mutual information of the optimal, i.e. mutual
 
