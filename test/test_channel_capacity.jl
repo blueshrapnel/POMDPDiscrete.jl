@@ -45,7 +45,7 @@ end
    3,3, [0.6 0.3 0.1; 0.7 0.1 0.2; 0.5 0.05 0.45]
     )
     r_x, C = blahut_arimoto_channel_capacity(trip_channel)
-    # @assert r_x ≈ [0.501735; 0; 0.498265]
-    # @assert C ≈ 0.161631
+    # @test r_x ≈ [0.501735; 0; 0.498265]
+    # @test C ≈ 0.161631
     # getting the right ballpark - find source to get exact answers
 end

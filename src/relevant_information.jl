@@ -20,6 +20,7 @@ Relevant information captures the information from the world (state space) which
 
 
 function InformationChannel(mdp::MDP)
+    # defaults to uniform conditional distribution
     size_X = length(states(mdp))
     size_Y = length(actions(mdp))
     pY_X = uniform_stochastic_policy(mdp).π
