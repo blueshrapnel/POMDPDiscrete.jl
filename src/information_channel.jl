@@ -35,7 +35,13 @@ function channel_capacity(channel, r, q,  log_base=2)
     C / log( log_base)
 end
 
-function blahut_arimoto_channel_capacity(channel::InformationChannel, max_iter=50, ε=1e-4, log_base=2)
+"""
+pY_X : defines conditional probablity p(Y|x), shape (dim_X, dim_Y)
+"""
+function blahut_arimoto_channel_capacity(channel::InformationChannel,
+        max_iter=50, ε=1e-4, log_base=2)
+    # TODO - use SparseArray for conditional probability
+
     # description of algorithm in Yeung "Information theory and network coding
     # normalisation helper functions
     norm_columns(A) = A./sum(A, dims=1)
