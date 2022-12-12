@@ -14,7 +14,7 @@ using Test
     # The analytic solution of the capaciy 1-(H_Pₑ) with r_x = [0.5; 0.5]
     H_Pₑ = -e * log(2,e) - (1-e) * log(2, 1-e)
     @test C ≈ 1 - H_Pₑ
-    
+
 end
 
 @testset "noiseless binary symmetric channel" begin
